@@ -50,7 +50,7 @@ var linuxStartStopScript = [
 	'',
 	'	if [ -z "$PID" ]; then',
 	'		echo starting ##NAME##',
-	'',
+	'',	
 	'		"##NODE_PATH##" ##NODE_ARGS## "##PROGRAM_PATH##" ##PROGRAM_ARGS## >/dev/null 2>&1 &',
 	'',
 	'		echo $! > "##PROGRAM_PATH##.pid"',
@@ -201,6 +201,7 @@ function add (name, options, cb) {
 
 	var username = options ? (options.username || null) : null;
 	var password = options ? (options.password || null) : null;
+	var pkg = options ? (options.pkg || null) : null;
 
 	if (os.platform() == "win32") {
 		var displayName = (options && options.displayName)
@@ -266,8 +267,15 @@ function add (name, options, cb) {
 						var line = linuxStartStopScript[i];
 						
 						line = line.replace("##NAME##", name);
-						line = line.replace("##NODE_PATH##", nodePath);
-						line = line.replace("##NODE_ARGS##", nodeArgsStr);
+						if (pkg) {
+							line = line.replace("##NODE_PATH##", nodePath);
+							line = line.replace("##NODE_ARGS##", '');
+						}
+						else {
+							line = line.replace("##NODE_PATH##", nodePath);
+							line = line.replace("##NODE_ARGS##", nodeArgsStr);
+						}
+						
 						line = line.replace("##PROGRAM_PATH##", programPath);
 						line = line.replace("##PROGRAM_ARGS##", programArgsStr);
 						line = line.replace("##RUN_LEVELS_ARR##", runLevels.join(" "));
